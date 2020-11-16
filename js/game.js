@@ -103,7 +103,15 @@ function createScene() {
   // mesh1 = new THREE.Mesh(geometry1, material1);
   // mesh1.position.y = 0.5;
 
-  // markerRoot1.add(mesh1);
+  var geomCockpit = new THREE.BoxGeometry(60, 50, 50, 1, 1, 1);
+  var matCockpit = new THREE.MeshPhongMaterial({
+    color: Colors.red,
+    shading: THREE.FlatShading,
+  });
+  var cockpit = new THREE.Mesh(geomCockpit, matCockpit);
+  cockpit.castShadow = true;
+  cockpit.receiveShadow = true;
+  markerRoot1.add(cockpit);
 }
 
 // HANDLE SCREEN EVENTS
@@ -164,7 +172,7 @@ function createDrum() {
   drum = new Drum();
   drum.mesh.scale.set(0.25, 0.25, 0.25);
   drum.mesh.position.y = 100;
-  markerRoot1.add(drum.mesh);
+  scene.add(drum.mesh);
 }
 
 function update() {
@@ -197,7 +205,7 @@ function init(event) {
   document.addEventListener("mousemove", handleMouseMove, false);
   createScene();
   createLights();
-  createDrum();
+  //createDrum();
   loop();
 }
 
