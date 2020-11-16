@@ -86,24 +86,24 @@ function createScene() {
     camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
   });
 
-  //   markerRoot1 = new THREE.Group();
-  //   scene.add(markerRoot1);
-  //   markerControls1 = new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
-  //     type: "pattern",
-  //     patternUrl: "data/hiro.patt",
-  //   });
+  markerRoot1 = new THREE.Group();
+  scene.add(markerRoot1);
+  markerControls1 = new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
+    type: "pattern",
+    patternUrl: "data/hiro.patt",
+  });
 
-  //   let geometry1 = new THREE.CubeGeometry(1, 1, 1);
-  //   let material1 = new THREE.MeshNormalMaterial({
-  //     transparent: true,
-  //     opacity: 0.5,
-  //     side: THREE.DoubleSide,
-  //   });
+  // let geometry1 = new THREE.CubeGeometry(1, 1, 1);
+  // let material1 = new THREE.MeshNormalMaterial({
+  //   transparent: true,
+  //   opacity: 0.5,
+  //   side: THREE.DoubleSide,
+  // });
 
-  //   mesh1 = new THREE.Mesh(geometry1, material1);
-  //   mesh1.position.y = 0.5;
+  // mesh1 = new THREE.Mesh(geometry1, material1);
+  // mesh1.position.y = 0.5;
 
-  //   markerRoot1.add(mesh1);
+  // markerRoot1.add(mesh1);
 }
 
 // HANDLE SCREEN EVENTS
@@ -164,12 +164,7 @@ function createDrum() {
   drum = new Drum();
   drum.mesh.scale.set(0.25, 0.25, 0.25);
   drum.mesh.position.y = 100;
-  scene.add(drum.mesh);
-
-  markerControls1 = new THREEx.ArMarkerControls(arToolkitContext, drum.mesh, {
-    type: "pattern",
-    patternUrl: "data/hiro.patt",
-  });
+  markerRoot1.add(drum.mesh);
 }
 
 function update() {
