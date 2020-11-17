@@ -93,24 +93,24 @@ function createScene() {
     patternUrl: "data/hiro.patt",
   });
 
-  // let geometry1 = new THREE.CubeGeometry(1, 1, 1);
-  // let material1 = new THREE.MeshNormalMaterial({
-  //   transparent: true,
-  //   opacity: 0.5,
-  //   side: THREE.DoubleSide,
-  // });
-
-  // mesh1 = new THREE.Mesh(geometry1, material1);
-  // mesh1.position.y = 0.5;
-
-  var geomCockpit = new THREE.BoxGeometry(60, 50, 50, 1, 1, 1);
-  var matCockpit = new THREE.MeshPhongMaterial({
-    color: Colors.red,
-    shading: THREE.FlatShading,
+  let geometry1 = new THREE.CubeGeometry(1, 1, 1);
+  let material1 = new THREE.MeshNormalMaterial({
+    transparent: true,
+    opacity: 0.5,
+    side: THREE.DoubleSide,
   });
-  mesh1 = new THREE.Mesh(geomCockpit, matCockpit);
-  mesh1.castShadow = true;
-  mesh1.receiveShadow = true;
+
+  mesh1 = new THREE.Mesh(geometry1, material1);
+  mesh1.position.y = 0.5;
+
+  // let geomCockpit = new THREE.BoxGeometry(60, 50, 50, 1, 1, 1);
+  // let matCockpit = new THREE.MeshPhongMaterial({
+  //   color: Colors.red,
+  //   shading: THREE.FlatShading,
+  // });
+  // mesh1 = new THREE.Mesh(geomCockpit, matCockpit);
+  // mesh1.castShadow = true;
+  // mesh1.receiveShadow = true;
   markerRoot1.add(mesh1);
 }
 
