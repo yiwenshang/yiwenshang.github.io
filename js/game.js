@@ -176,10 +176,10 @@ function createDrum() {
 }
 
 function update() {
-  var targetY = normalize(mousePos.y, -0.75, 0.75, 25, 175);
-  var targetX = normalize(mousePos.x, -0.75, 0.75, -100, 100);
-  drum.mesh.position.y = targetY;
-  drum.mesh.position.x = targetX;
+  // var targetY = normalize(mousePos.y, -0.75, 0.75, 25, 175);
+  // var targetX = normalize(mousePos.x, -0.75, 0.75, -100, 100);
+  // drum.mesh.position.y = targetY;
+  // drum.mesh.position.x = targetX;
   if (arToolkitSource.ready !== false)
     arToolkitContext.update(arToolkitSource.domElement);
 }
@@ -202,7 +202,7 @@ function loop() {
 }
 
 function init(event) {
-  document.addEventListener("mousemove", handleMouseMove, false);
+  // document.addEventListener("mousemove", handleMouseMove, false);
   createScene();
   createLights();
   //createDrum();
