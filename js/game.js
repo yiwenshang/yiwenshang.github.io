@@ -108,10 +108,10 @@ function createScene() {
     color: Colors.red,
     shading: THREE.FlatShading,
   });
-  var cockpit = new THREE.Mesh(geomCockpit, matCockpit);
-  cockpit.castShadow = true;
-  cockpit.receiveShadow = true;
-  markerRoot1.add(cockpit);
+  mesh1 = new THREE.Mesh(geomCockpit, matCockpit);
+  mesh1.castShadow = true;
+  mesh1.receiveShadow = true;
+  markerRoot1.add(mesh1);
 }
 
 // HANDLE SCREEN EVENTS
