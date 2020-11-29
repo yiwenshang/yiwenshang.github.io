@@ -20,7 +20,7 @@ var scene,
   deltaTime,
   totalTime;
 
-var arToolkitSource, arToolkitContext, markerControls1;
+var arToolkitSource, arToolkitContext;
 
 var markerRoot1, markerRoot2;
 
@@ -88,10 +88,14 @@ function createScene() {
 
   markerRoot1 = new THREE.Group();
   scene.add(markerRoot1);
-  markerControls1 = new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
-    type: "pattern",
-    patternUrl: "data/hiro.patt",
-  });
+  let markerControls1 = new THREEx.ArMarkerControls(
+    arToolkitContext,
+    markerRoot1,
+    {
+      type: "pattern",
+      patternUrl: "data/hiro.patt",
+    }
+  );
 
   let geometry1 = new THREE.CubeGeometry(1, 1, 1);
   let material1 = new THREE.MeshNormalMaterial({
@@ -209,12 +213,12 @@ function init(event) {
   loop();
 }
 
-var mousePos = { x: 0, y: 0 };
+// var mousePos = { x: 0, y: 0 };
 
-function handleMouseMove(event) {
-  var tx = -1 + (event.clientX / WIDTH) * 2;
-  var ty = 1 - (event.clientY / HEIGHT) * 2;
-  mousePos = { x: tx, y: ty };
-}
+// function handleMouseMove(event) {
+//   var tx = -1 + (event.clientX / WIDTH) * 2;
+//   var ty = 1 - (event.clientY / HEIGHT) * 2;
+//   mousePos = { x: tx, y: ty };
+// }
 
 window.addEventListener("load", init, false);
