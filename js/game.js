@@ -646,8 +646,7 @@ function createDong() {
 }
 
 function detectDrum_Ham() {
-  console.log("x: " + distance_x + " y: " + distance_y + " z: " + distance_z);
-
+  // console.log("x: " + distance_x + " y: " + distance_y + " z: " + distance_z);
   if (
     distance_x < drum_sideLen / 2 + ham_len / 2 - ham_offset &&
     distance_x > drum_sideLen / 2 + ham_len / 2 - ham_offset - drum_sideLen &&
@@ -692,23 +691,39 @@ function detect_ham_down() {
   //在过去一秒钟里，在某区域中，hamer的坐标下降了1
   //记录这一时刻ham的坐标和半秒前和一秒前的坐标
   //每一次更新都舍弃一个旧的，增添一个新的
+  // console.log(
+  //   "x: " +
+  //     smoothedRoot_ham.position.x +
+  //     " y: " +
+  //     smoothedRoot_ham.position.y +
+  //     " z: " +
+  //     smoothedRoot_ham.position.z
+  // );
 
   var flag = true;
   for (var i = 1; i < ham_pos_y.length; i++) {
     if (ham_pos_y[i - 1] > ham_pos_y[i]) {
       flag = false;
+      ham_pos_y = [];
+      ham_pos_x = [];
+      // console.log("falg is false because pos y");
+      // console.log(
+      //   "ham_pos_y[i - 1] > ham_pos_y[i] is ",
+      //   ham_pos_y[i - 1] - ham_pos_y[i]
+      // );
     }
-    if (ham_pos_x[i] < -0.3) {
+    if (ham_pos_x[i] < -0.5) {
       flag = false;
+      ham_pos_y = [];
+      ham_pos_x = [];
+      // console.log("falg is false because pos x");
     }
   }
+
   if (flag && ham_pos_y[ham_pos_y.length - 1] - ham_pos_y[0] > 1) {
-    console.log(ham_pos_y[ham_pos_y.length - 1] - ham_pos_y[0]);
+    //console.log(ham_pos_y[ham_pos_y.length - 1] - ham_pos_y[0]);
     return true;
   } else {
-    if (flag) {
-      console.log("flag is true, but...");
-    }
     return false;
   }
 }
@@ -732,13 +747,6 @@ function update() {
     //     smoothedRoot_ham.position.z
     // );
   }
-  //50
-  ham_pos_y.unshift(smoothedRoot_ham.position.y);
-  ham_pos_x.unshift(smoothedRoot_ham.position.x);
-  if (ham_pos_y.length > 50) {
-    ham_pos_y.pop();
-    ham_pos_x.pop();
-  }
 
   distance_x = smoothedRoot_drum.position.x - smoothedRoot_ham.position.x;
   distance_y = smoothedRoot_ham.position.y - smoothedRoot_drum.position.y;
@@ -747,6 +755,14 @@ function update() {
   );
 
   if (markerControls1.object3d.visible && markerControls2.object3d.visible) {
+    //50
+    ham_pos_y.unshift(smoothedRoot_ham.position.y);
+    ham_pos_x.unshift(smoothedRoot_ham.position.x);
+    if (ham_pos_y.length > 30) {
+      ham_pos_y.pop();
+      ham_pos_x.pop();
+    }
+    //console.log(ham_pos_y);
     if (detect_ham_down()) {
       console.log("hammer down!");
     }
