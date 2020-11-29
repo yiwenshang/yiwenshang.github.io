@@ -743,14 +743,14 @@ function detect_ham_down() {
 function update() {
   if (markerControls2.object3d.visible) {
     //console.log(smoothedRoot_ham.rotation);
-    console.log(
-      "degree rotation x: " +
-        (smoothedRoot_ham.rotation.x / Math.PI) * 180 +
-        " y: " +
-        (smoothedRoot_ham.rotation.y / Math.PI) * 180 +
-        " z: " +
-        (smoothedRoot_ham.rotation.z / Math.PI) * 180
-    );
+    // console.log(
+    //   "degree rotation x: " +
+    //     (smoothedRoot_ham.rotation.x / Math.PI) * 180 +
+    //     " y: " +
+    //     (smoothedRoot_ham.rotation.y / Math.PI) * 180 +
+    //     " z: " +
+    //     (smoothedRoot_ham.rotation.z / Math.PI) * 180
+    // );
     // console.log(
     //   "x: " +
     //     smoothedRoot_ham.position.x +
@@ -800,17 +800,17 @@ function update() {
         Math.sin(smoothedRoot_ham.rotation.x + Math.PI) *
           (ham_len / 2 - ham_offset));
 
-    console.log(
-      "rot x<0, offest of z is " +
-        Math.sin(smoothedRoot_ham.rotation.x + Math.PI) *
-          (ham_len / 2 - ham_offset) +
-        " rot x is " +
-        ((smoothedRoot_ham.rotation.x + Math.PI) / Math.PI) * 180
-    );
-    console.log(
-      "drum z- ham z is " +
-        (smoothedRoot_drum.position.z - smoothedRoot_ham.position.z)
-    );
+    // console.log(
+    //   "rot x<0, offest of z is " +
+    //     Math.sin(smoothedRoot_ham.rotation.x + Math.PI) *
+    //       (ham_len / 2 - ham_offset) +
+    //     " rot x is " +
+    //     ((smoothedRoot_ham.rotation.x + Math.PI) / Math.PI) * 180
+    // );
+    // console.log(
+    //   "drum z- ham z is " +
+    //     (smoothedRoot_drum.position.z - smoothedRoot_ham.position.z)
+    // );
   }
 
   if (markerControls1.object3d.visible && markerControls2.object3d.visible) {
@@ -830,8 +830,8 @@ function update() {
       console.log("drum rotation x is ", drum.mesh.rotation.x);
     }
     if (detectDrum_Ham()) {
-      // beat += 1;
-      // console.log("Bingo!");
+      beat += 1;
+      console.log("Bingo!");
       if (beat == 1) {
         chipHolder.spawnChip(smoothedRoot_ham.position, 1);
       }
