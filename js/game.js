@@ -33,7 +33,7 @@ var font_beat, inTarget, inTargetDong, lastDong;
 
 var target_pos = { x: -3.5, y: 0, z: 0.1 };
 
-var ham_len = 4;
+var ham_len = 2.5;
 var drum_sideLen = 1;
 var ham_sideLen = 0.15;
 
@@ -43,6 +43,10 @@ var btnS_x = 1.6,
 
 var radius_dong = 0.25,
   radius_target = 0.3;
+
+var ham_offset = -1.5;
+
+var right_side;
 
 var drum_color;
 
@@ -62,6 +66,7 @@ let distance_z;
 var userinterface;
 var drum_controller, drum_rot_z;
 var ham_pos_y = [];
+var ham_pos_x = [];
 
 //SCREEN & MOUSE VARIABLES
 
@@ -101,7 +106,7 @@ function initialize() {
     alpha: true,
   });
 
-  renderer.setSize(640, 480);
+  renderer.setSize(WIDTH, HEIGHT);
   renderer.domElement.style.position = "absolute";
   renderer.domElement.style.top = "0px";
   renderer.domElement.style.left = "0px";
@@ -136,8 +141,8 @@ function initialize() {
   arToolkitContext = new THREEx.ArToolkitContext({
     cameraParametersUrl: "data/camera_para.dat",
     detectionMode: "mono",
-    canvasWidth: 640,
-    canvasHeight: 480,
+    canvasWidth: WIDTH,
+    canvasHeight: HEIGHT,
     imageSmoothingEnabled: true,
   });
 
@@ -148,6 +153,8 @@ function initialize() {
   drawInterfaceGroup();
   drawDrumGroup();
   drawHammerGroup();
+  console.log("info of renderer", renderer);
+  console.log("info of arToolkitSource", arToolkitSource);
   console.log("info of scene", scene);
 }
 
@@ -168,7 +175,6 @@ function drawDrumGroup() {
 
   smoothedRoot_drum = new THREE.Group();
   smoothedRoot_drum.name = "Drum SmmoothedRoot";
-  smoothedRoot_drum.scale.set(0.5, 0.5, 0.5);
   scene.add(smoothedRoot_drum);
   smoothedControls_drum = new THREEx.ArSmoothedControls(smoothedRoot_drum, {
     lerpPosition: 0.8,
@@ -340,7 +346,7 @@ Chip.prototype.splash = function (pos, scale) {
 ChipHolder = function () {
   this.mesh = new THREE.Object3D();
   this.mesh.position = smoothedRoot_ham.position;
-  this.mesh.position.z = smoothedRoot_ham.position.z - 2;
+  this.mesh.position.z = smoothedRoot_ham.position.z + ham_offset - ham_len / 2;
 };
 
 DongHolder = function () {
@@ -376,7 +382,7 @@ ChipHolder.prototype.spawnChip = function (pos, scale) {
     chip = new Chip();
     this.mesh.add(chip.mesh);
     chip.mesh.visible = true;
-
+    //pos.z = pos.z + ham_offset;
     chip.splash(pos, scale);
   }
 };
@@ -422,7 +428,7 @@ var Drum = function () {
       drum_sideLen / 2,
       (drum_sideLen * 1.2) / 2,
       0.1 * drum_sideLen,
-      40
+      120
     ),
     material_drum
   );
@@ -440,7 +446,7 @@ var Drum = function () {
       (drum_sideLen * 1.2) / 2,
       drum_sideLen / 2,
       0.1 * drum_sideLen,
-      40
+      120
     ),
     material_drum
   );
@@ -460,11 +466,21 @@ var Drum = function () {
   //   scene.add(drum);
 };
 
+var Top = function () {
+  this.mesh = new THREE.Object3D();
+  this.mesh.name = "Top";
+  var hammer2 = new THREE.Mesh(
+    new THREE.SphereGeometry((ham_sideLen / 2) * 2.5, 32, 32),
+    material_hummer
+  );
+  this.mesh.add(hammer2);
+};
+
 var Hammer = function () {
   this.mesh = new THREE.Object3D();
 
   material_hummer = new THREE.MeshPhongMaterial({
-    color: Colors.white,
+    color: Colors.brown,
     flatShading: THREE.FlatShading,
   });
   var hammer1 = new THREE.Mesh(
@@ -590,14 +606,20 @@ function createDrumController() {
 
 function createDrum() {
   drum = new Drum();
-  drum.mesh.position.y = 0;
+  //drum.mesh.position.y = 0;
+  //drum.mesh.scale.set(0.5, 0.5, 0.5);
   smoothedRoot_drum.add(drum.mesh);
 }
 
 function createHammer() {
   hammer = new Hammer();
-  hammer.mesh.position.y = 0;
+  hammer.mesh.position.z = ham_offset;
   smoothedRoot_ham.add(hammer.mesh);
+}
+function createTop() {
+  var top = new Top();
+  top.mesh.position.set(0, 0, 0);
+  smoothedRoot_ham.add(top.mesh);
 }
 
 function createPlate() {
@@ -623,12 +645,16 @@ function createDong() {
   smoothedRoot_drum.add(dongHolder.mesh);
 }
 
-function detectDrum_Ham(smoothedRoot_drum, smoothedRoot_ham) {
+function detectDrum_Ham() {
+  console.log("x: " + distance_x + " y: " + distance_y + " z: " + distance_z);
+
   if (
-    distance_x < drum_sideLen / 2 + ham_len / 2 &&
-    distance_y < drum_sideLen / 2 + ham_sideLen / 2 &&
-    distance_z < drum_sideLen / 2 + ham_sideLen / 2
+    distance_x < drum_sideLen / 2 + ham_len / 2 - ham_offset &&
+    distance_x > drum_sideLen / 2 + ham_len / 2 - ham_offset - drum_sideLen &&
+    distance_y < ham_sideLen / 2 &&
+    distance_z < drum_sideLen / 2 + (ham_sideLen / 2) * 2.5
   ) {
+    console.log("in drum range");
     return true;
   } else {
     return false;
@@ -672,38 +698,50 @@ function detect_ham_down() {
     if (ham_pos_y[i - 1] > ham_pos_y[i]) {
       flag = false;
     }
+    if (ham_pos_x[i] < -0.3) {
+      flag = false;
+    }
   }
   if (flag && ham_pos_y[ham_pos_y.length - 1] - ham_pos_y[0] > 1) {
-    //console.log(ham_pos_x);
     console.log(ham_pos_y[ham_pos_y.length - 1] - ham_pos_y[0]);
     return true;
   } else {
+    if (flag) {
+      console.log("flag is true, but...");
+    }
     return false;
   }
 }
 
 function update() {
   if (markerControls2.object3d.visible) {
-    console.log(
-      "x: " +
-        (smoothedRoot_ham.rotation.x * Math.PI) / 180 +
-        " y: " +
-        (smoothedRoot_ham.rotation.y * Math.PI) / 180 +
-        " z: " +
-        (smoothedRoot_ham.rotation.z * Math.PI) / 180
-    );
+    // console.log(
+    //   "x: " +
+    //     (smoothedRoot_ham.rotation.x * Math.PI) / 180 +
+    //     " y: " +
+    //     (smoothedRoot_ham.rotation.y * Math.PI) / 180 +
+    //     " z: " +
+    //     (smoothedRoot_ham.rotation.z * Math.PI) / 180
+    // );
+    // console.log(
+    //   "x: " +
+    //     smoothedRoot_ham.position.x +
+    //     " y: " +
+    //     smoothedRoot_ham.position.y +
+    //     " z: " +
+    //     smoothedRoot_ham.position.z
+    // );
   }
   //50
   ham_pos_y.unshift(smoothedRoot_ham.position.y);
+  ham_pos_x.unshift(smoothedRoot_ham.position.x);
   if (ham_pos_y.length > 50) {
     ham_pos_y.pop();
+    ham_pos_x.pop();
   }
-  distance_x = Math.abs(
-    smoothedRoot_drum.position.x - smoothedRoot_ham.position.x
-  );
-  distance_y = Math.abs(
-    smoothedRoot_drum.position.y - smoothedRoot_ham.position.y
-  );
+
+  distance_x = smoothedRoot_drum.position.x - smoothedRoot_ham.position.x;
+  distance_y = smoothedRoot_ham.position.y - smoothedRoot_drum.position.y;
   distance_z = Math.abs(
     smoothedRoot_drum.position.z - smoothedRoot_ham.position.z
   );
@@ -712,7 +750,7 @@ function update() {
     if (detect_ham_down()) {
       console.log("hammer down!");
     }
-    if (detectDrum_Ham(smoothedRoot_drum, smoothedRoot_ham)) {
+    if (detectDrum_Ham()) {
       beat += 1;
       console.log("Bingo!");
       if (beat == 1) {
@@ -741,14 +779,13 @@ function update() {
       beat = 0;
     }
 
-    if (detectBtnS_Ham() && !game_start) {
-      button_start.transform();
-      game_start = true;
-    }
+    // if (detectBtnS_Ham() && !game_start) {
+    //   button_start.transform();
+    //   game_start = true;
+    // }
   }
   score_display.innerHTML = score;
   combo_display.innerHTML = combo;
-
   // update artoolkit on every frame
   if (arToolkitSource.ready !== false)
     //source is image/video/webcam
@@ -760,7 +797,6 @@ function update() {
 }
 
 function render() {
-  //scene.scale.set(0.5, 0.5, 0.5);
   renderer.render(scene, camera);
 }
 
