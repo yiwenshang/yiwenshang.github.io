@@ -64,7 +64,9 @@ let distance_y;
 let distance_z;
 
 var userinterface;
+var drum_rotation_controller;
 var drum_controller, drum_rot_z;
+var PLATE_HEIGHT = 3;
 var ham_pos_y = [];
 var ham_pos_x = [];
 
@@ -398,17 +400,20 @@ var DrumController = function () {
     color: Colors.brownDark,
     flatShading: THREE.FlatShading,
   });
-  var plate = new THREE.Mesh(new THREE.CubeGeometry(0.2, 3, 0.1), material1);
+  var plate = new THREE.Mesh(
+    new THREE.CubeGeometry(0.2, PLATE_HEIGHT, 0.1),
+    material1
+  );
   plate.name = "drum controller plate";
-  var controller = new THREE.Mesh(
+  drum_rotation_controller = new THREE.Mesh(
     new THREE.CubeGeometry(0.4, 0.2, 0.2),
     material2
   );
-  controller.name = "drum controller switch";
-  controller.position.set(0, 0, 0.1);
+  drum_rotation_controller.name = "drum controller switch";
+  drum_rotation_controller.position.set(0, PLATE_HEIGHT / 2 - 0.2 - 0.03, 0.1);
 
   this.mesh.add(plate);
-  this.mesh.add(controller);
+  this.mesh.add(drum_rotation_controller);
 };
 
 var Drum = function () {
@@ -691,14 +696,6 @@ function detect_ham_down() {
   //在过去一秒钟里，在某区域中，hamer的坐标下降了1
   //记录这一时刻ham的坐标和半秒前和一秒前的坐标
   //每一次更新都舍弃一个旧的，增添一个新的
-  // console.log(
-  //   "x: " +
-  //     smoothedRoot_ham.position.x +
-  //     " y: " +
-  //     smoothedRoot_ham.position.y +
-  //     " z: " +
-  //     smoothedRoot_ham.position.z
-  // );
 
   var flag = true;
   for (var i = 1; i < ham_pos_y.length; i++) {
@@ -763,8 +760,12 @@ function update() {
       ham_pos_x.pop();
     }
     //console.log(ham_pos_y);
-    if (detect_ham_down()) {
+    if (detect_ham_down() && drum.mesh.rotation.x < Math.PI / 2) {
       console.log("hammer down!");
+      drum.mesh.rotateX(Math.PI / 36);
+      drum_rotation_controller.position.y -=
+        (Math.PI / 36 / (Math.PI / 2)) * (PLATE_HEIGHT - (0.03 + 0.2) * 2);
+      console.log("drum rotation x is ", drum.mesh.rotation.x);
     }
     if (detectDrum_Ham()) {
       beat += 1;
