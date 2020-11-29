@@ -69,6 +69,7 @@ var drum_controller, drum_rot_z;
 var PLATE_HEIGHT = 3;
 var ham_pos_y = [];
 var ham_pos_x = [];
+var top_pos;
 
 //SCREEN & MOUSE VARIABLES
 
@@ -419,9 +420,10 @@ var DrumController = function () {
 var Drum = function () {
   this.mesh = new THREE.Object3D();
 
-  material_drum = new THREE.MeshPhongMaterial({
+  material_drum = new THREE.MeshStandardMaterial({
     color: Colors.white,
     flatShading: THREE.FlatShading,
+    roughness: 1.0,
   });
   material_drum_body = new THREE.MeshPhongMaterial({
     color: Colors.brownDark,
@@ -474,11 +476,20 @@ var Drum = function () {
 var Top = function () {
   this.mesh = new THREE.Object3D();
   this.mesh.name = "Top";
-  var hammer2 = new THREE.Mesh(
-    new THREE.SphereGeometry((ham_sideLen / 2) * 2.5, 32, 32),
-    material_hummer
+  material_top = new THREE.MeshPhongMaterial({
+    color: Colors.pink,
+    flatShading: THREE.FlatShading,
+  });
+  var drum2 = new THREE.Mesh(
+    new THREE.CylinderGeometry(
+      (drum_sideLen * 1.3) / 2,
+      (drum_sideLen * 1.3) / 2,
+      0.01 * drum_sideLen,
+      40
+    ),
+    material_top
   );
-  this.mesh.add(hammer2);
+  this.mesh.add(drum2);
 };
 
 var Hammer = function () {
@@ -614,6 +625,7 @@ function createDrum() {
   //drum.mesh.position.y = 0;
   //drum.mesh.scale.set(0.5, 0.5, 0.5);
   smoothedRoot_drum.add(drum.mesh);
+  //createTop();
 }
 
 function createHammer() {
@@ -624,7 +636,7 @@ function createHammer() {
 function createTop() {
   var top = new Top();
   top.mesh.position.set(0, 0, 0);
-  smoothedRoot_ham.add(top.mesh);
+  smoothedRoot_drum.add(top.mesh);
 }
 
 function createPlate() {
@@ -651,12 +663,15 @@ function createDong() {
 }
 
 function detectDrum_Ham() {
-  // console.log("x: " + distance_x + " y: " + distance_y + " z: " + distance_z);
+  console.log(
+    "distance x: " + distance_x + " y: " + distance_y + " z: " + distance_z
+  );
+  //console.log(0.1 * drum_sideLen + (ham_sideLen * 2.5) / 2);
   if (
-    distance_x < drum_sideLen / 2 + ham_len / 2 - ham_offset &&
-    distance_x > drum_sideLen / 2 + ham_len / 2 - ham_offset - drum_sideLen &&
-    distance_y < ham_sideLen / 2 &&
-    distance_z < drum_sideLen / 2 + (ham_sideLen / 2) * 2.5
+    distance_x < drum_sideLen / 2 &&
+    distance_x > drum_sideLen / 2 - drum_sideLen &&
+    distance_y < 0.1 * drum_sideLen + (ham_sideLen * 2.5) / 2 &&
+    Math.abs(distance_z) < drum_sideLen / 2 + (ham_sideLen / 2) * 2.5
   ) {
     console.log("in drum range");
     return true;
@@ -727,14 +742,15 @@ function detect_ham_down() {
 
 function update() {
   if (markerControls2.object3d.visible) {
-    // console.log(
-    //   "x: " +
-    //     (smoothedRoot_ham.rotation.x * Math.PI) / 180 +
-    //     " y: " +
-    //     (smoothedRoot_ham.rotation.y * Math.PI) / 180 +
-    //     " z: " +
-    //     (smoothedRoot_ham.rotation.z * Math.PI) / 180
-    // );
+    //console.log(smoothedRoot_ham.rotation);
+    console.log(
+      "degree rotation x: " +
+        (smoothedRoot_ham.rotation.x / Math.PI) * 180 +
+        " y: " +
+        (smoothedRoot_ham.rotation.y / Math.PI) * 180 +
+        " z: " +
+        (smoothedRoot_ham.rotation.z / Math.PI) * 180
+    );
     // console.log(
     //   "x: " +
     //     smoothedRoot_ham.position.x +
@@ -743,16 +759,62 @@ function update() {
     //     " z: " +
     //     smoothedRoot_ham.position.z
     // );
+    // console.log(
+    //   Math.cos(-Math.PI / 2 - smoothedRoot_ham.rotation.y) *
+    //     (ham_len / 2 - ham_offset)
+    // );
   }
 
-  distance_x = smoothedRoot_drum.position.x - smoothedRoot_ham.position.x;
-  distance_y = smoothedRoot_ham.position.y - smoothedRoot_drum.position.y;
-  distance_z = Math.abs(
-    smoothedRoot_drum.position.z - smoothedRoot_ham.position.z
-  );
+  distance_x =
+    smoothedRoot_drum.position.x -
+    smoothedRoot_ham.position.x -
+    Math.cos(-Math.PI / 2 - smoothedRoot_ham.rotation.y) *
+      (ham_len / 2 - ham_offset);
+  distance_y =
+    smoothedRoot_ham.position.y -
+    smoothedRoot_drum.position.y +
+    Math.sin(-Math.PI / 2 - smoothedRoot_ham.rotation.y) *
+      (ham_len / 2 - ham_offset);
+
+  if (smoothedRoot_ham.rotation.x > 0) {
+    distance_z = smoothedRoot_drum.position.z - smoothedRoot_ham.position.z;
+    // distance_z =
+    //   smoothedRoot_drum.position.z -
+    //   (smoothedRoot_ham.position.z +
+    //     Math.sin(smoothedRoot_ham.rotation.x) * (ham_len / 2 - ham_offset));
+
+    // console.log(
+    //   "rot x>0, offest of z is " +
+    //     Math.sin(smoothedRoot_ham.rotation.x) * (ham_len / 2 - ham_offset) +
+    //     " rot x is " +
+    //     (smoothedRoot_ham.rotation.x / Math.PI) * 180
+    // );
+    // console.log(
+    //   "drum z- ham z is " +
+    //     (smoothedRoot_drum.position.z - smoothedRoot_ham.position.z)
+    // );
+  } else {
+    distance_z =
+      smoothedRoot_drum.position.z -
+      (smoothedRoot_ham.position.z +
+        Math.sin(smoothedRoot_ham.rotation.x + Math.PI) *
+          (ham_len / 2 - ham_offset));
+
+    console.log(
+      "rot x<0, offest of z is " +
+        Math.sin(smoothedRoot_ham.rotation.x + Math.PI) *
+          (ham_len / 2 - ham_offset) +
+        " rot x is " +
+        ((smoothedRoot_ham.rotation.x + Math.PI) / Math.PI) * 180
+    );
+    console.log(
+      "drum z- ham z is " +
+        (smoothedRoot_drum.position.z - smoothedRoot_ham.position.z)
+    );
+  }
 
   if (markerControls1.object3d.visible && markerControls2.object3d.visible) {
-    //50
+    //30
     ham_pos_y.unshift(smoothedRoot_ham.position.y);
     ham_pos_x.unshift(smoothedRoot_ham.position.x);
     if (ham_pos_y.length > 30) {
@@ -768,8 +830,8 @@ function update() {
       console.log("drum rotation x is ", drum.mesh.rotation.x);
     }
     if (detectDrum_Ham()) {
-      beat += 1;
-      console.log("Bingo!");
+      // beat += 1;
+      // console.log("Bingo!");
       if (beat == 1) {
         chipHolder.spawnChip(smoothedRoot_ham.position, 1);
       }
@@ -852,8 +914,9 @@ var ambientLight, hemisphereLight, shadowLight;
 
 function createLights() {
   hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x000000, 0.9);
-  shadowLight = new THREE.DirectionalLight(0xffffff, 0.9);
-  shadowLight.position.set(150, 350, 350);
+  shadowLight = new THREE.DirectionalLight(0xffffff, 0.6);
+  // shadowLight.position.set(150, 350, 350);
+  shadowLight.position.set(0, 50, 0);
   shadowLight.castShadow = true;
   shadowLight.shadow.camera.left = -400;
   shadowLight.shadow.camera.right = 400;
